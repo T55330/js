@@ -2,7 +2,7 @@
   <div class="home">
     <header>
       <label for="">
-        <input type="search" v-model="password">
+        <input type="search" v-model="password" :placeholder="search_ico">
         <button class="search-btn" @click="search">搜索</button>
       </label>
     </header>
@@ -43,9 +43,9 @@
           {{item.name}}
           <em>￥{{item.price}}</em>
           <div>
-            <button class="shoping-sub icon-minus" @click="s_sub(itemnindex)">-</button>
+            <button class="shoping-sub icon-minus" @click="s_sub(item,index)"></button>
             <span>{{item.num}}</span>
-            <button class="shoping-ad icon-plus" @click="s_add(itemnindex)">+</button>
+            <button class="shoping-ad icon-plus" @click="s_add(item)"></button>
           </div>
         </li>
       </ul>
@@ -68,48 +68,100 @@
 </template>
 <script>
 import axios from 'axios'
-export default ({
+import $ from 'jquery'
+import par from '../assets/js/parabola'
+export default({
   name:'home',
   data(){
     return{
       password:'',
-      search_ico:'',
+      search_ico:"\ue903 请输入菜品名称",
       goods_cls:[],
       goods:[],
       cur_goods_cls:0,
       showShoppingCart:false,
       shopping_cart:[
-        {
-          id:1,
-          name:'红烧肉',
-          price:6,
-          num:7
-        }
         ],
-        totalNum:10,
-        totalPrice:10
+        totalNum:0,
+        totalPrice:0
+    }
+  },
+  watch:{
+    shopping_cart:{
+      handler(curval){
+        this.totalNum = 0 
+        this.totalPrice = 0
+       for (let i in this.goods){
+         this.goods[i].checked = false
+       }
+       curval.forEach(item=>{
+         this.totalPrice += item.num * item.price
+         this.totalNum += item.num
+         this.goods[item.id].checked = true
+       })
+      },
+      deep:true
     }
   },
    methods:{
       search(){
 
       },
-      order(id,event){
-        id
-        event
+      order(item,event){
+       this.shopping_cart.push({  
+        id:item.id,
+        name:item.name,
+        price:item.price,
+        num:1
+       })
+       let el = $('<div class="parabola-el"></div>')
+       $(document.body).append(el)
+       new par.parabola({
+         origin:event.target,
+         target:'#shoppingBtn',
+         element:el,
+         time:500,
+         a:0.01,
+         callback(el){
+           el.remove()
+         }
+       }).move()
       },
       clearShopping(){
+         this.showShoppingCart = !this.showShoppingCart
+         this.shopping_cart = []
+      },
 
+      s_sub(item,index){
+        item.num--
+        if(item.num==0){
+          this.shopping_cart.splice(index,1)
+        }
       },
       s_add(item){
-item
+        item.num++
       },
-      s_sub(item){
-        item
-      },
+       changeMenu(index){
+      let aUl = $('.order-class')
+      $(window).scrollTop(aUl.eq(index).position().top)
+    },
       pay(){
 
+      },
+      winScroll(){
+        let _this = this
+        let scrollTop =  $(window).scrollTop()
+        let oItem = $('.order-class')
+        oItem.each(function(i){
+          if($(this).offset().top<scrollTop+200){
+            _this.cur_goods_cls = i + 1 
+          }
+        })
       }
+    },
+   
+      mounted(){
+        window.addEventListener('scroll',this.winScroll)
     },
     created(){
       axios.get('/data.json')
