@@ -2,7 +2,7 @@
   <div class="home">
     <header>
       <label for="">
-        <input type="search" v-model="password" :placeholder="search_ico">
+        <input type="search" v-model="keyword" :placeholder="search_ico">
         <button class="search-btn" @click="search">搜索</button>
       </label>
     </header>
@@ -74,7 +74,7 @@ export default({
   name:'home',
   data(){
     return{
-      password:'',
+      keyword:'',
       search_ico:"\ue903 请输入菜品名称",
       goods_cls:[],
       goods:[],
@@ -105,7 +105,8 @@ export default({
   },
    methods:{
       search(){
-
+          this.$store.commit('update_keyword',this.keyword);
+          this.$router.push('/list')
       },
       order(item,event){
        this.shopping_cart.push({  
@@ -168,6 +169,7 @@ export default({
       .then(res=>{
         this.goods = res.data.goods
         this.goods_cls = res.data.goods_cls
+        this.$store.commit('update_goods',this.goods);
       })
     }
 })
