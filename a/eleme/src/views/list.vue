@@ -11,13 +11,13 @@
                 <h4>{{item.name}}</h4>
                 <p>{{item.description}}</p>
                 <strong>${{item.price}}</strong>
-                <button @click='point(item)' :class='["point-btn",item.checked?"ac":""]' :disable='item.checked'>
+                <button @click='pointer(item)' :class='["point-btn",item.checked?"ac":""]' :disable='item.checked'>
 
                 </button>
 
             </li>
         </ul>
-        <div style="text-"></div>
+        <div style="text-align=center" v-if='search_list.length==0'></div>
     </div>
 </template>
 <script>
@@ -26,15 +26,7 @@ export default ({
     date(){
         return {
             shopping_cart:[],
-            search_list:[
-                {
-                    id:1,
-                    name: 'aaaa',
-                    img:
-                    description:'asdsadsa',
-                    price:10
-                }
-            ],
+            search_list:[],
             keyword:''
         }
     },
@@ -43,7 +35,7 @@ export default ({
         this.goods = this.$store.state.goods
         this.shopping_cartb = this.$store.shopping_cart
         for(let key in this.goods){
-            if(this.goods[key].name.includes(this.keywords)&& this.keyword != ){
+            if(this.goods[key].name.includes(this.keywords)&& this.keyword != ''){
                 this.search_list.push(this.goods[key])
             }
         }
@@ -51,6 +43,3 @@ export default ({
 })
 </script>
 
-<style lang="stylus" scoped>
-
-</style>
